@@ -14,9 +14,6 @@ Theoretically, we propose the *first* rigorous PAC analysis for estimating the r
 
 The takeaway message is anomaly detection practitioner must *not* blindly believe in SOTA models, and must treat additional labeled data with extra care.
 
-In this code repository, we provide an easy
-
-
 
 ## 2. Requirements
 ```
@@ -33,7 +30,7 @@ The high-level structure of the codebase follows the ICLR '20 paper "[Deep semi-
 
 - `./dataset` provides various data loaders supporting datasets like [ImageNet](https://www.image-net.org/), [FashionMNIST](https://github.com/zalandoresearch/fashion-mnist), [Driver Anomaly Detection](https://www.ei.tum.de/mmk/dad/), [Retina OCT Images](https://www.kaggle.com/paultimothymooney/kermany2018), and your own customized datasets. You can check the the `main_loading.py` inside for a detailed list.
 - `./network` provides several network structures to build up the model. Please see the viables options in `main_network.py`.
-- `./model` contains six popular and SOTA models for anomaly detection, ranging from Deep SVDD to Autoencoding Binary Classifier. Please check our paper for the detailed model description.
+- `./model` contains six popular and SOTA models for anomaly detection with deep learning, ranging from Deep SVDD to Autoencoding Binary Classifier. Please check our paper for the detailed model description.
 - `./main` contains the main files to verify the PAC analysis or to characterize the effect of bias.
 
 
