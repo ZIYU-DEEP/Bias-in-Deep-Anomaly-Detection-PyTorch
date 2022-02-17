@@ -56,7 +56,7 @@ parser.add_argument('-lb_a', '--label_abnormal', type=int, default=4,
                     help='The abnormal data needed in training the model.')
 parser.add_argument('-ra', '--ratio_abnormal', type=float, default=0.1,
                     help='The amount of abnormal data needed in training.')
-parser.add_argument('-l', '--test_list', action='append', default=[3, 4, 50, 49, 52, 53, 527, 620, 429, 430],
+parser.add_argument('-l', '--test_list', action='append', default=[3, 4, 5, 6, 7],
                     help='For satimage: -l 4 -l 1 -l 2 -l 5 -l 7')
 
 # Arguments for main_network
