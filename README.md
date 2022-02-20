@@ -12,7 +12,9 @@ Simply put, we discover the counter-intuitive fact that additional labeled data 
 
 Theoretically, we propose the *first* rigorous PAC analysis for estimating the relative scoring bias for deep anomaly detection; empirically, we provide the *first* comprehensive experiments on how a biased training anomaly set affects the detection performance on different anomaly classes.
 
-The takeaway message is anomaly detection practitioner must *not* blindly believe in SOTA models, and must treat additional labeled data with extra care.
+The main takeaway message is anomaly detection practitioner must *not* blindly believe in SOTA models, and must treat additional labeled data with extra care.
+
+Again, the big picture is: the ***access to more information*** leads to ***worse generalization*** in the presence of ***distributional shift***. If you are interested in learning more about such phenomena more broadly, i recommend you to read this one: [Causal Confusion in Imitation Learning](https://arxiv.org/abs/1905.11979), NeurIPS '19.
 
 
 ## 2. Requirements
