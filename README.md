@@ -38,27 +38,30 @@ The high-level structure of the codebase follows the ICLR '20 paper "[Deep semi-
 
 ## 4. Commands
 For reimplementation our work of PAC analysis:
-```
-$ python ./main/main_pac_gaussian_train.py --loader_name gaussian9d_hard --n 2000 --mix 1 --ratio_abnormal 0.1 --n_feature 9
+```shell
+cd ./main
+python main_pac_gaussian_train.py --loader_name gaussian9d_hard --n 2000 --mix 1 --ratio_abnormal 0.1 --n_feature 9
 ```
 
 For reimplementation our work of general anomaly detection (and identify bias):
-```
+```shell
+cd ./main
+
 # (Unsupervised) ImageNet with Deep SVDD
-$ python ./main/main_vision.py --loader_name imagenet --root ./data/ --label_normal 3 --label_abnormal 1 --ratio_abnormal 0.1 --net_name imagenet_WideResNet_one_class --optimizer_ one_class_unsupervised -l 504 -l 67 -l 900
+python main_vision.py --loader_name imagenet --root ./data/ --label_normal 3 --label_abnormal 1 --ratio_abnormal 0.1 --net_name imagenet_WideResNet_one_class --optimizer_ one_class_unsupervised -l 504 -l 67 -l 900
 
 # (Semi-Supervised) FashionMNIST with Deep SAD
-$ python ./main/main_vision.py --loader_name fmnist --root ./data/ --label_normal 2 --label_abnormal 4 --ratio_abnormal 0.1 --net_name fmnist_LeNet_one_class --optimizer_ one_class -l 1 -l 3 -l 5 -l 6 -l 7
+python main_vision.py --loader_name fmnist --root ./data/ --label_normal 2 --label_abnormal 4 --ratio_abnormal 0.1 --net_name fmnist_LeNet_one_class --optimizer_ one_class -l 1 -l 3 -l 5 -l 6 -l 7
 
 # (Supervised) Real-world dataset Satimage with Hypersphere Classifier
-$ python ./main/main_real.py --loader_name real --filename satimage --label_normal 3 --label_abnormal 1 --ratio_abnormal 0.1 --net_name satimage_hsc --optimizer_ hsc
+python main_real.py --loader_name real --filename satimage --label_normal 3 --label_abnormal 1 --ratio_abnormal 0.1 --net_name satimage_hsc --optimizer_ hsc
 ```
 The data for the real-world datasets are downloadable on UCI repository; please check our paper for details.
 
 
 
 ## 5. Citation
-```
+```tex
 @inproceedings{ye2021understanding,
   author    = {Ziyu Ye and Yuxin Chen and Haitao Zheng},
   editor    = {Zhi-Hua Zhou},
