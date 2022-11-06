@@ -2,7 +2,7 @@
 Title: spectrum_net.py
 """
 
-from base_net import BaseNet
+from .base_net import BaseNet
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

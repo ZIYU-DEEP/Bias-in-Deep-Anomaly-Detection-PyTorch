@@ -5,7 +5,7 @@ __pycache__
 .idea
 !data/
 data/*
-!data/toy.pkl
+!data/satimage.pkl
 results
 scripts/epoch_dicts
 *.ipynb

@@ -1,4 +1,4 @@
-from base_optimizer import BaseTrainer, BaseEvaluater
+from .base_optimizer import BaseTrainer, BaseEvaluater
 from sklearn.metrics import roc_auc_score
 import torch.optim as optim
 import torch.nn as nn

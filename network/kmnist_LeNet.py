@@ -3,7 +3,7 @@ Title: kmnist_LeNet.py
 Reference: https://github.com/lukasruff/Deep-SAD-PyTorch/tree/master/src/networks
 """
 
-from base_net import BaseNet
+from .base_net import BaseNet
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

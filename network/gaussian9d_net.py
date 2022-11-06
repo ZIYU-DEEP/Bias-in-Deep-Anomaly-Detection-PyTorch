@@ -3,7 +3,7 @@ Title: gaussian3d_net.py
 Description: The network for 3D Gasussian datasets, suitable for Deep SVDD or Deep SAD.
 """
 
-from base_net import BaseNet
+from .base_net import BaseNet
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

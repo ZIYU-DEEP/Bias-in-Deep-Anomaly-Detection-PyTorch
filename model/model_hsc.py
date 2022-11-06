@@ -3,8 +3,8 @@ sys.path.append('../network/')
 
 import torch
 import json
-from main_network import build_network
-from hsc_optimizer import HSCTrainer, HSCEvaluater
+from network.main import build_network
+from .hsc_optimizer import HSCTrainer, HSCEvaluater
 
 
 # --------------------------------------------

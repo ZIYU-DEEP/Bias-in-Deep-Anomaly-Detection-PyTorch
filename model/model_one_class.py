@@ -3,8 +3,8 @@ sys.path.append('../network/')
 
 import torch
 import json
-from main_network import build_network, build_autoencoder
-from one_class_optimizer import OneClassTrainer, OneClassTrainer_, OneClassEvaluater, AETrainer
+from network.main import build_network, build_autoencoder
+from .one_class_optimizer import OneClassTrainer, OneClassTrainer_, OneClassEvaluater, AETrainer
 
 
 # #########################################################################

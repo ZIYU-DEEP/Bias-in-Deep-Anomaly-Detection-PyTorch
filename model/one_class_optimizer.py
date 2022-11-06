@@ -1,4 +1,4 @@
-from base_optimizer import BaseTrainer, BaseEvaluater
+from .base_optimizer import BaseTrainer, BaseEvaluater
 from sklearn.metrics import roc_auc_score
 import torch.optim as optim
 import torch.nn as nn
@@ -65,7 +65,6 @@ class AETrainer(BaseTrainer):
         start_time = time.time()
         ae_net.train()
         for epoch in range(self.n_epochs):
-            scheduler.step()
             if epoch in self.lr_milestones:
                 logger.info('  LR scheduler: new learning rate is %g' % float(scheduler.get_lr()[0]))
 

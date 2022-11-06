@@ -1,23 +1,23 @@
 """
-Title: main_loading.py
+Title: main.py
 Description: The loading functions.
 """
 
-from gaussian9d_loader import Gaussian9DLoader
-from gaussian9d_hard_loader import Gaussian9DHardLoader
-from synthetic_loader import SyntheticLoader
-from real_loader import RealLoader
-from kmnist_loader import KMNISTLoader
-from fmnist_loader import FashionMNISTLoader
-from mnist_loader import MNISTLoader
-from imagenet_loader import ImageNetLoader
-from cifar10_loader import CIFAR10Loader
-from real_pac_loader import RealPacLoader
-from real_pac_config_loader import RealPacConfigLoader
-from fmnist_config_loader import FashionMNISTConfigLoader
-from dad_loader import DADLoader
-from oct_loader import OCTLoader
-from oct_resize_loader import OCTResizeLoader
+from .gaussian9d_loader import Gaussian9DLoader
+from .gaussian9d_hard_loader import Gaussian9DHardLoader
+from .synthetic_loader import SyntheticLoader
+from .real_loader import RealLoader
+from .kmnist_loader import KMNISTLoader
+from .fmnist_loader import FashionMNISTLoader
+from .mnist_loader import MNISTLoader
+from .imagenet_loader import ImageNetLoader
+from .cifar10_loader import CIFAR10Loader
+from .real_pac_loader import RealPacLoader
+from .real_pac_config_loader import RealPacConfigLoader
+from .fmnist_config_loader import FashionMNISTConfigLoader
+from .dad_loader import DADLoader
+from .oct_loader import OCTLoader
+from .oct_resize_loader import OCTResizeLoader
 
 
 # #########################################################################
@@ -72,7 +72,8 @@ def load_dataset(loader_name: str='gaussian9d',
                                ratio_abnormal)
 
     if loader_name == 'real':
-        return RealLoader(filename,
+        return RealLoader(root,
+                          filename,
                           train,
                           n_normal_train,
                           load_method,
