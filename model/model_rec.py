@@ -3,15 +3,21 @@ sys.path.append('../network/')
 
 import torch
 import json
-from main_network import build_network
-from abc_optimizer import ABCTrainer, ABCEvaluater
+from network.main import build_network
+from .rec_optimizer import RecTrainer, RecTrainer_, RecEvaluater
 
 
 # --------------------------------------------
 # 3.3. (a) Model Object for training
 # --------------------------------------------
-class ABCModel:
-    def __init__(self):
+class RecModel:
+    def __init__(self,
+                 optimizer_: str = 'rec',
+                 eta: float = 1.0):
+        known_optimizer_ = ('rec', 'rec_unsupervised')
+        assert optimizer_ in known_optimizer_
+        self.optimizer_ = optimizer_
+        self.eta = eta
         self.net_name = None
         self.net = None
         self.trainer = None
@@ -23,14 +29,19 @@ class ABCModel:
         self.net_name = net_name
         self.net = build_network(net_name)
 
-    def train(self, dataset, eta=None, optimizer_name: str = 'adam', lr: float = 0.001,
-              n_epochs: int = 60, lr_milestones: tuple = (100, 160, 220),
+    def train(self, dataset, eta: float = 1, optimizer_name: str = 'adam',
+              lr: float = 0.001, n_epochs: int = 60, lr_milestones: tuple = (100, 160, 220),
               batch_size: int = 32, weight_decay: float = 1e-6, device: str = 'cuda:1',
               n_jobs_dataloader: int = 0, label_normal: tuple=(0,), split: bool=False):
         print('Learning rate: {}'.format(lr))
+        self.optimizer_name = optimizer_name
 
-        self.trainer = ABCTrainer(optimizer_name, lr, n_epochs, lr_milestones,
-                                  batch_size, weight_decay, device, n_jobs_dataloader)
+        if self.optimizer_ == 'rec':
+            self.trainer = RecTrainer(eta, optimizer_name, lr, n_epochs, lr_milestones,
+                                      batch_size, weight_decay, device, n_jobs_dataloader)
+        if self.optimizer_ == 'rec_unsupervised':
+            self.trainer = RecTrainer_(eta, optimizer_name, lr, n_epochs, lr_milestones,
+                                       batch_size, weight_decay, device, n_jobs_dataloader)
 
         self.net = self.trainer.train(dataset, self.net, label_normal, split)
         self.results['train_time'] = self.trainer.train_time
@@ -63,8 +74,14 @@ class ABCModel:
 # --------------------------------------------
 # 3.3. (b) Model Object for Evaluating
 # --------------------------------------------
-class ABCModelEval:
-    def __init__(self):
+class RecModelEval:
+    def __init__(self,
+                 optimizer_,
+                 eta: float = 1.0):
+        known_optimizer_ = ('rec', 'rec_unsupervised')
+        assert optimizer_ in known_optimizer_
+        self.optimizer_ = optimizer_
+        self.eta = eta
         self.net = None
         self.evaluater= None
         self.optimizer_name = None
@@ -80,16 +97,16 @@ class ABCModelEval:
 
     def test(self,
              dataset,
-             eta=None,
+             eta: float = 1,
              batch_size: int = 32,
              device: str = 'cuda:1',
              n_jobs_dataloader: int = 0,
              label_normal: tuple=(0,)):
 
         if self.evaluater is None:
-            self.evaluater = ABCEvaluater(batch_size, device, n_jobs_dataloader)
+            self.evaluater = RecEvaluater(eta, batch_size, device, n_jobs_dataloader)
 
-        self.evaluater.test(dataset, self.net, label_normal)
+        self.evaluater.test(self.optimizer_, dataset, self.net, label_normal)
         self.results['test_time'] = self.evaluater.test_time
         self.results['test_scores'] = self.evaluater.test_scores
 

@@ -1,3 +1,4 @@
+from pathlib import Path
 from math import sin, cos
 from abc import ABC, abstractmethod
 from torch.utils.data import Subset
@@ -8,7 +9,6 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
 import torch
-import joblib
 import sklearn
 import numpy as np
 
@@ -40,6 +40,7 @@ class BaseLoader(ABC):
 # #########################################################################
 class RealDataset(Dataset):
     def __init__(self,
+                 root: str='../data',
                  filename: str='satimage',
                  train: int=0,
                  n_normal_train: int=1200,
@@ -50,7 +51,7 @@ class RealDataset(Dataset):
                  label_abnormal: tuple=(4,),
                  ratio_abnormal: float=0.1):
 
-        X, y = joblib.load(f'../../data/{filename}.pkl')
+        X, y = torch.load(Path(root) / f'{filename}.pkl')
         # Currently do not support multiple labels
         label_normal = int(label_normal[0])
         label_abnormal = int(label_abnormal[0])
@@ -132,6 +133,7 @@ class RealDataset(Dataset):
 # #########################################################################
 class RealLoader(BaseLoader):
     def __init__(self,
+                 root: str='../data',
                  filename: str='satimage',
                  train: int=0,
                  n_normal_train: int=1200,
@@ -144,7 +146,8 @@ class RealLoader(BaseLoader):
         super().__init__()
 
         # Get train set
-        self.all_set = RealDataset(filename,
+        self.all_set = RealDataset(root,
+                                   filename,
                                    train,
                                    n_normal_train,
                                    load_method,

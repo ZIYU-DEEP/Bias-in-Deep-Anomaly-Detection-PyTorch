@@ -3,21 +3,25 @@ Title: main_network.py
 Description: Build networks.
 """
 
-from mnist_LeNet import MNISTLeNet, MNISTLeNetAutoencoder
-from fmnist_LeNet import FashionMNISTLeNet, FashionMNISTLeNetAutoencoder
-from kmnist_LeNet import KMNISTLeNet, KMNISTLeNetAutoencoder
-from cifar10_LeNet import CIFAR10LeNet, CIFAR10LeNetAutoencoder
-from gaussian3d_net import Guassian3DNet, Gaussian3DNetAutoencoder
-from gaussian9d_net import Guassian9DNet, Gaussian9DNetAutoencoder
-from imagenet_WideResNet import ImageNetWideResNet, ImageNetWideResNetAutoencoder
-from spectrum_net import SpectrumNet, SpectrumAutoencoder
-from mlp import *
+from .mnist_LeNet import MNISTLeNet, MNISTLeNetAutoencoder
+from .fmnist_LeNet import FashionMNISTLeNet, FashionMNISTLeNetAutoencoder
+from .kmnist_LeNet import KMNISTLeNet, KMNISTLeNetAutoencoder
+from .cifar10_LeNet import CIFAR10LeNet, CIFAR10LeNetAutoencoder
+from .gaussian3d_net import Guassian3DNet, Gaussian3DNetAutoencoder
+from .gaussian9d_net import Guassian9DNet, Gaussian9DNetAutoencoder
+from .imagenet_WideResNet import ImageNetWideResNet, ImageNetWideResNetAutoencoder
+from .spectrum_net import SpectrumNet, SpectrumAutoencoder
+from .mlp import *
 
 
 # ####################m#####################################################
 # 1. Build the Network Used for Training
 # #########################################################################
-def build_network(net_name='fmnist_LeNet_one_class'):
+def build_network(net_name='fmnist_LeNet_one_class',
+                  rep_dim=128,
+                  x_dim=8,
+                  h_dims=None,
+                  bias=False):
 
     net_name = net_name.strip()
 
@@ -167,7 +171,11 @@ def build_network(net_name='fmnist_LeNet_one_class'):
 # #########################################################################
 # 2. Build the Network Used for Pre-Training (Only for One-Class Model)
 # #########################################################################
-def build_autoencoder(net_name='fmnist_LeNet_one_class'):
+def build_autoencoder(net_name='fmnist_LeNet_one_class',
+                      rep_dim=128,
+                      x_dim=8,
+                      h_dims=None,
+                      bias=False):
 
     net_name = net_name.strip()
 

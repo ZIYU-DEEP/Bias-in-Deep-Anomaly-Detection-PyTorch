@@ -1,89 +1,88 @@
 """
-Be sure to modify the test list!
-[Title] main_real.py
-[Description] The main file to run the models for real-world datasets.
+[Title] main.py
+[Description] The main file to run the models for torch.vision datasets.
 """
+
 
 # ############################################
 # 0. Preparation
 # ############################################
-import sys
-sys.path.append('../dataset/')
-sys.path.append('../network/')
-sys.path.append('../model/')
+from model import *
+from helper import utils
+from loader import load_dataset
+from pathlib import Path
 
 import os
+import sys
 import glob
 import time
 import torch
-import joblib
-import logging
 import argparse
 import numpy as np
 import pandas as pd
 
-from pathlib import Path
-from utils import *
-from main_loading import *
-from main_network import *
-from main_model_rec import *
-from main_model_one_class import *
-from main_model_hsc import *
-from main_model_abc import *
-from sklearn.metrics import roc_auc_score
-
-# Must specify:
-# for un: -lm -nt -op
-# for semi: -lm -lb_a -nt -op
-
 # Initialize the parser
 parser = argparse.ArgumentParser()
 
+# Arguments for config FashionMNIST
+parser.add_argument('-cfg', '--config', type=int, default=0,
+                    help='If config, set to be 1; else 0')
+parser.add_argument('-lb_a_l', '--label_abnormal_list',
+                    action='append', default=[1])
+parser.add_argument('-ra_a', '--ratio_a', type=float, default=0.1,
+                    help='The ratio of the first element in training')
+parser.add_argument('-ra_b', '--ratio_b', type=float, default=0.9,
+                    help='The ratio of the second element in training')
+
 # Arguments for main_loading
-parser.add_argument('-ln', '--loader_name', type=str, default='real',
+parser.add_argument('-ln', '--loader_name', type=str, default='fmnist',
                     help='The name for the dataset to be loaded.')
-parser.add_argument('-fn', '--filename', type=str, default='satimage',
-                    help='e.g. covertype, phish_url, shuttle, gas_drift')
-parser.add_argument('-n', '--n_normal_train', type=int, default=1200,
-                    help='The number of normal data in training.')
-parser.add_argument('-lb_n', '--label_normal', type=int, default=3,
+parser.add_argument('-rt', '--root', type=str, default='./data/',
+                    help='The root for the data folder.')
+parser.add_argument('-fn', '--filename', type=str, default='FashionMNIST',
+                    help='The filename for your data, e.g., MNIST.')
+parser.add_argument('-rr', '--results_root', type=str, default='./results',
+                    help='The directory to save results.')
+parser.add_argument('-lb_n', '--label_normal', type=int, default=0,
                     help='The normal data needed in training the model.')
 parser.add_argument('-lb_a', '--label_abnormal', type=int, default=1,
                     help='The abnormal data needed in training the model.')
 parser.add_argument('-ra', '--ratio_abnormal', type=float, default=0.1,
                     help='The amount of abnormal data needed in training.')
-parser.add_argument('-tt', '--threshold_type', type=int, default=1,
-                    help='If 0, use the test part; If 1, use all normal data to set threshold.')
-parser.add_argument('-l', '--abnormal_test_list', action='append', default=[1, 2, 3, 4, 5, 6, 7],
-                    help='For satimage: -l 4 -l 1 -l 2 -l 5 -l 7; ')
+parser.add_argument('-l', '--test_list', type=str, default='1',
+                    help='The label list to test, e.g. 1, 1-2-3, etc.')
 
 # Arguments for main_network
-parser.add_argument('-nt', '--net_name', type=str, default='satimage_one_class',
+parser.add_argument('-nt', '--net_name', type=str, default='fmnist_LeNet_one_class',
                     help='[Choice]: synthetic_one_class, synthetic_rec')
 
 # Arguments for main_model
 parser.add_argument('-op', '--optimizer_', type=str, default='one_class',
-                    help='[Choice]: one_class, one_class_unsupervised, rec, rec_unsupervised')
+                    help='The anomaly detection model used for optimizer.',
+                    choices=['one_class', 'one_class_unsupervised',
+                            'rec', 'rec_unsupervised',
+                            'abc', 'hsc'])
 parser.add_argument('-pt', '--pretrain', type=int, default=1,
                     help='[Choice]: Only apply to DeepSAD model: 1 if True, 0 if False')
-parser.add_argument('--load_model', type=str, default='',
+parser.add_argument('-mdl', '--load_model', type=str, default='',
                     help='[Example]: ./model.tar')
 parser.add_argument('-et', '--eta_str', default=100,
                     help='The _% representation of eta - choose from 100, 50, 25, etc.')
-parser.add_argument('--optimizer_name', type=str, default='adam')
-parser.add_argument('--lr', type=float, default=0.001)
-parser.add_argument('--ae_lr', type=float, default=0.001)
-parser.add_argument('--n_epochs', type=int, default=200)
-parser.add_argument('--ae_n_epochs', type=int, default=100)
-parser.add_argument('--lr_milestones', type=int, default='60')
-parser.add_argument('--batch_size', type=int, default=128)
-parser.add_argument('--weight_decay', type=float, default=0.5e-6)
-parser.add_argument('--ae_weight_decay', type=float, default=0.5e-3)
-parser.add_argument('-gpu', '--device_no', type=int, default=1)
-parser.add_argument('--n_jobs_dataloader', type=int, default=0)
-parser.add_argument('--save_ae', type=int, default=1,
+parser.add_argument('-opn', '--optimizer_name', type=str, default='adam')
+parser.add_argument('-lr', '--lr', type=float, default=0.001)
+parser.add_argument('-ae_lr', '--ae_lr', type=float, default=0.001)
+parser.add_argument('-ne', '--n_epochs', type=int, default=200)
+parser.add_argument('-ane', '--ae_n_epochs', type=int, default=100)
+parser.add_argument('-lm', '--lr_milestones', type=int, default='80')
+parser.add_argument('-bs', '--batch_size', type=int, default=128)
+parser.add_argument('-wd', '--weight_decay', type=float, default=0.5e-6)
+parser.add_argument('-awd', '--ae_weight_decay', type=float, default=0.5e-3)
+parser.add_argument('-device', '--device', type=str, default='cuda',
+                    help='Use cpu, cuda, or cuda:1, etc.')
+parser.add_argument('-nj', '--n_jobs_dataloader', type=int, default=0)
+parser.add_argument('-sa', '--save_ae', type=int, default=1,
                     help='Only apply to Deep SAD model.')
-parser.add_argument('--load_ae', type=int, default=0,
+parser.add_argument('-la', '--load_ae', type=int, default=0,
                     help='Only apply to Deep SAD model.')
 
 p = parser.parse_args()
@@ -93,27 +92,22 @@ p = parser.parse_args()
 # ===========================================
 # Exract from parser
 print('Loading parameters...')
-loader_name, filename, n_normal_train = p.loader_name, p.filename, p.n_normal_train
+ratio_a, ratio_b = p.ratio_a, p.ratio_b
+config, label_abnormal_list = p.config, p.label_abnormal_list
+loader_name, root = p.loader_name, p.root
 label_normal, label_abnormal = tuple([p.label_normal]), tuple([p.label_abnormal])
-ratio_abnormal, abnormal_test_list = p.ratio_abnormal, [int(i) for i in p.abnormal_test_list]
-threshold_type = p.threshold_type
+if config == 1:
+    label_abnormal = tuple(label_abnormal_list)
+ratio_abnormal, test_list = p.ratio_abnormal, utils.str_to_list(p.test_list)
 
 net_name, pretrain, load_model = p.net_name, int(p.pretrain), p.load_model
 optimizer_, eta_str, optimizer_name = p.optimizer_, p.eta_str, p.optimizer_name
 ae_lr, lr, n_epochs, ae_n_epochs, batch_size = p.ae_lr, p.lr, p.n_epochs, p.ae_n_epochs, p.batch_size
-weight_decay, ae_weight_decay, device_no, n_jobs_dataloader = p.weight_decay, p.ae_weight_decay, p.device_no, p.n_jobs_dataloader
+weight_decay, ae_weight_decay, device, n_jobs_dataloader = p.weight_decay, p.ae_weight_decay, p.device, p.n_jobs_dataloader
 save_ae, load_ae = bool(p.save_ae), bool(p.load_ae)
 lr_milestones = tuple(i for i in range(p.lr_milestones, n_epochs, p.lr_milestones))
 
-# Re-define abnormal_test_list for specific dataset
-if filename == 'awid': abnormal_test_list = list(range(4))
-if filename in ['spectrum', 'spectrum-searle']: abnormal_test_list = list(range(5))
-if filename in ['spectrum-ryerson-mixed']: abnormal_test_list = list(range(8))
-if loader_name == 'dad': abnormal_test_list = list(range(1, 9))
-if loader_name in ['oct', 'oct_resize']: abnormal_test_list = list(range(4))
-
 # Define addional parameters
-device = 'cuda:{}'.format(device_no)
 eta = float(eta_str * 0.01)
 
 # Debug
@@ -125,15 +119,18 @@ print('optimizer_', optimizer_)
 # ===========================================
 # Define folder to save the model and relating results
 # Note that we delete pretrain here; the default setting is pretrain.
-out_path = f'../result/{loader_name}/{filename}'
+out_path = f'{p.results_root}/{loader_name}'
 
 print('Checking paths...')
 if optimizer_ in ['rec', 'one_class', 'hsc', 'abc']:
     load_method = 2
-    folder_name = f'[semi-model]_{optimizer_}_[lb_n]_{p.label_normal}_[lb_a]_{p.label_abnormal}_[ra]_{ratio_abnormal}_[lr]_{lr}_[epoch]_{n_epochs}_[net]_{net_name}_[th_type]_{threshold_type}'
+    if config == 0:
+        folder_name = f'[semi-model]_{optimizer_}_[lb_n]_{p.label_normal}_[lb_a]_{p.label_abnormal}_[ra]_{ratio_abnormal}_[lr]_{lr}_[epoch]_{n_epochs}_[net]_{net_name}'
+    elif config == 1:
+        folder_name = f'[semi-model]_{optimizer_}_[lb_n]_{p.label_normal}_[lb_a]_{label_abnormal}_[ra_a]_{ratio_a}_[ra_b]_{ratio_b}_[ra]_{ratio_abnormal}_[lr]_{lr}_[epoch]_{n_epochs}_[net]_{net_name}'
 elif optimizer_ in ['rec_unsupervised', 'one_class_unsupervised']:
     load_method = 0
-    folder_name = f'[un-model]_{optimizer_}_[lb_n]_{p.label_normal}_[lr]_{lr}_[epoch]_{n_epochs}_[net]_{net_name}_[th_type]_{threshold_type}'
+    folder_name = f'[un-model]_{optimizer_}_[lb_n]_{p.label_normal}_[lr]_{lr}_[epoch]_{n_epochs}_[net]_{net_name}'
 
 final_path = Path(out_path) / folder_name
 if not os.path.exists(out_path): os.makedirs(out_path)
@@ -153,15 +150,7 @@ recall_history_path = Path(final_path) / 'recall_history.pkl'
 # ===========================================
 # 0.3. Setup Logger
 # ===========================================
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-file_handler = logging.FileHandler(log_path)
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-print(final_path)
+logger = utils.set_logger(log_path)
 
 
 # ############################################
@@ -169,13 +158,15 @@ print(final_path)
 # ############################################
 # Initialize data
 dataset = load_dataset(loader_name=loader_name,
-                       filename=filename,
+                       root=root,
+                       filename=p.filename,
                        train=1,
-                       n_normal_train=n_normal_train,
                        load_method=load_method,
                        label_normal=label_normal,
                        label_abnormal=label_abnormal,
-                       ratio_abnormal=ratio_abnormal)
+                       ratio_abnormal=ratio_abnormal,
+                       ratio_a=ratio_a,
+                       ratio_b=ratio_b)
 
 # Load Deep SAD model
 if optimizer_ in ['one_class', 'one_class_unsupervised']:
@@ -225,22 +216,28 @@ print('Finished. Now I am going to bed. Bye.')
 # 2. Model Evaluation (Set the Threshold)
 # ############################################
 # Use model eval to load dataset
-if optimizer_ in ['one_class', 'one_class_unsupervised']: model = OneClassModelEval(optimizer_, eta)
-elif optimizer_ in ['rec', 'rec_unsupervised']: model = RecModelEval(optimizer_, eta)
-elif optimizer_ == 'hsc': model = HSCModelEval()
-elif optimizer_ == 'abc': model = ABCModelEval()
+if optimizer_ in ['one_class', 'one_class_unsupervised']:
+    model = OneClassModelEval(optimizer_, eta)
+elif optimizer_ in ['rec', 'rec_unsupervised']:
+    model = RecModelEval(optimizer_, eta)
+elif optimizer_ == 'hsc':
+    model = HSCModelEval()
+elif optimizer_ == 'abc':
+    model = ABCModelEval()
+else:
+    raise Exception('Please input valid model type.')
 
 model.set_network(net_name)
 model.load_model(model_path=model_path, map_location=device)
 
 # Only load normal data, as we just need to set the threshold by FPR
 dataset_eval = load_dataset(loader_name=loader_name,
-                            filename=filename,
+                            root=root,
+                            filename=p.filename,
                             train=0,
-                            n_normal_train=n_normal_train,
                             load_method=0,
-                            threshold_type=threshold_type,
-                            label_normal=label_normal)
+                            label_normal=label_normal,
+                            threshold_type=1)
 
 # Evaluation on the test part of the dataset used to train
 model.test(dataset=dataset_eval,
@@ -256,7 +253,7 @@ indices_, labels_, scores_ = np.array(indices_), np.array(labels_), np.array(sco
 
 # Get thresholds
 cut_results = {}
-for fpr in [0.90, 0.95, 0.99]:
+for fpr in [0.90, 0.95, 0.99]: # typo here, fpr should be 0.05; here fpr is tnr
     cut_results[fpr] = np.quantile(scores_, fpr)
 
 # Save the thresholds
@@ -276,30 +273,32 @@ f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 f.write(f'\n[folder_name] {folder_name}\n\n')
 
 if recall_history_path.is_file():
-    recall_history = joblib.load(recall_history_path)
+    recall_history = torch.load(recall_history_path)
 else:
-    recall_history = {i: [] for i in abnormal_test_list}
+    recall_history = {i: [] for i in test_list}
 
-for label_abnormal_test in abnormal_test_list:
-    # Print intro
-    intro_str = f'[label] {label_abnormal_test}\n'
-    print(intro_str); f.write(intro_str)
-
-    # Get the dataset
+for label_abnormal_test in test_list:
+    # Skip for normal data
     if (label_abnormal_test == p.label_abnormal) and optimizer_ in ['rec', 'one_class', 'abc', 'hsc']:
         trained_type = 1
     else:
         trained_type = 0
 
+    # Print intro
+    intro_str = f'[label] {label_abnormal_test}\n'
+    print(intro_str); f.write(intro_str)
+
     # Get the dataset
     dataset_test = load_dataset(loader_name=loader_name,
-                                filename=filename,
+                                filename=p.filename,
+                                root=root,
                                 train=0,
-                                n_normal_train=n_normal_train,
-                                trained_type=trained_type,
                                 load_method=1,
                                 label_abnormal=tuple([label_abnormal_test]),
-                                ratio_abnormal=ratio_abnormal)
+                                ratio_abnormal=ratio_abnormal,
+                                ratio_a=ratio_a,
+                                ratio_b=ratio_b,
+                                trained_type=trained_type)
 
     # Test on the dataset
     model.test(dataset=dataset_test,
@@ -337,8 +336,8 @@ for label_abnormal_test in abnormal_test_list:
     f.write('\n')
 
 # Save score results and test results
-joblib.dump(score_results, score_results_path)
-joblib.dump(recall_history, recall_history_path)
+torch.save(score_results, score_results_path)
+torch.save(recall_history, recall_history_path)
 pd.DataFrame(recall_results).to_csv(recall_results_path, sep='\t')
 
 # Finalize

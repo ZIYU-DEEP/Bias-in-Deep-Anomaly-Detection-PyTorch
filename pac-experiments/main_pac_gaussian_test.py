@@ -7,8 +7,7 @@
 # 0. Preparation
 # ############################################
 import sys
-sys.path.append('../dataset/')
-sys.path.append('../network/')
+sys.path.append('../loader/')
 sys.path.append('../model/')
 
 import os
@@ -24,7 +23,6 @@ import pandas as pd
 from pathlib import Path
 from utils import *
 from main_loading import *
-from main_network import *
 from main_model_rec import *
 from main_model_one_class import *
 from sklearn.metrics import roc_auc_score

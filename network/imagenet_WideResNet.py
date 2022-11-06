@@ -1,7 +1,7 @@
 import torch.nn as nn
 
-from base_net import BaseNet
-from cbam import CBAM
+from .base_net import BaseNet
+from .cbam import CBAM
 from torch.nn import init
 import torch.nn.functional as F
 import torch
