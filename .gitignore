@@ -1,0 +1,12 @@
+*.DS_Store
+*._.DS_Store
+__pycache__
+*/__pycache__
+.idea
+!data/
+data/*
+!data/toy.pkl
+results
+scripts/epoch_dicts
+*.ipynb
+.ipynb_checkpoints/
