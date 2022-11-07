@@ -11,6 +11,9 @@ label_abnormal=4
 ratio_abnormal=0.1
 test_list=1-3-5-6-7
 
+# Arguments for network
+net_name=fmnist_LeNet_one_class
+
 # Arguments for model; choose from the following:
 # [Unsupervised model] one_class_unsupervised, rec_unsupervised
 # [Supervised model] one_class, rec, hsc, abc

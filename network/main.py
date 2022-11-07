@@ -20,7 +20,7 @@ from .mlp import *
 def build_network(net_name='fmnist_LeNet_one_class',
                   rep_dim=128,
                   x_dim=8,
-                  h_dims=None,
+                  h_dims='32-16',
                   bias=False):
 
     net_name = net_name.strip()
@@ -83,24 +83,24 @@ def build_network(net_name='fmnist_LeNet_one_class',
 
     # Gaussian9D Debug
     if net_name in ['gaussian9d_one_class', 'gaussian9d_hsc']:
-        return MLP(x_dim=9, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP(x_dim=9, h_dims='32-16', rep_dim=8, bias=False)
 
     if net_name in ['gaussian9d_rec', 'gaussian9d_abc']:
-        return MLP_Autoencoder(x_dim=9, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=9, h_dims='32-16', rep_dim=8, bias=False)
 
     # Gaussian9D Debug
     if net_name == 'gaussian9d_one_class_debug':
-        return MLP(x_dim=9, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP(x_dim=9, h_dims='32-16', rep_dim=8, bias=False)
 
     if net_name == 'gaussian9d_rec_debug':
-        return MLP_Autoencoder(x_dim=9, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=9, h_dims='32-16', rep_dim=8, bias=False)
 
     # Synthetic
     if net_name == 'synthetic_one_class':
-        return MLP(x_dim=9, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP(x_dim=9, h_dims='32-16', rep_dim=8, bias=False)
 
     if net_name == 'synthetic_rec':
-        return MLP_Autoencoder(x_dim=9, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=9, h_dims='32-16', rep_dim=8, bias=False)
 
     # imagenet
     if net_name in ['imagenet_WideResNet_one_class', 'imagenet_WideResNet_hsc']:
@@ -125,45 +125,45 @@ def build_network(net_name='fmnist_LeNet_one_class',
 
     # Satimage
     if net_name in ['satimage_one_class', 'satimage_hsc']:
-        return MLP(x_dim=36, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP(x_dim=x_dim, h_dims=h_dims, rep_dim=rep_dim, bias=False)
 
     if net_name in ['satimage_rec', 'satimage_abc']:
-        return MLP_Autoencoder(x_dim=36, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=x_dim, h_dims=h_dims, rep_dim=rep_dim, bias=False)
 
     # Covertype
     if net_name in ['covertype_one_class', 'covertype_hsc']:
-        return MLP(x_dim=54, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP(x_dim=54, h_dims='32-16', rep_dim=8, bias=False)
 
     if net_name in ['covertype_rec', 'covertype_abc']:
-        return MLP_Autoencoder(x_dim=54, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=54, h_dims='32-16', rep_dim=8, bias=False)
 
     # phish_url
     if net_name in ['phish_url_one_class', 'phish_url_hsc']:
-        return MLP(x_dim=79, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP(x_dim=79, h_dims='32-16', rep_dim=8, bias=False)
 
     if net_name in ['phish_url_rec', 'phish_url_abc']:
-        return MLP_Autoencoder(x_dim=79, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=79, h_dims='32-16', rep_dim=8, bias=False)
 
     # shuttle
     if net_name in ['shuttle_one_class', 'shuttle_hsc']:
-        return MLP(x_dim=9, h_dims=[16, 8], rep_dim=4, bias=False)
+        return MLP(x_dim=9, h_dims='16-8', rep_dim=4, bias=False)
 
     if net_name in ['shuttle_rec', 'shuttle_abc']:
-        return MLP_Autoencoder(x_dim=9, h_dims=[16, 8], rep_dim=4, bias=False)
+        return MLP_Autoencoder(x_dim=9, h_dims='16-8', rep_dim=4, bias=False)
 
     # gas_drift
     if net_name in ['gas_drift_one_class', 'gas_drift_hsc']:
-        return MLP(x_dim=128, h_dims=[64, 32], rep_dim=16, bias=False)
+        return MLP(x_dim=128, h_dims='64-32', rep_dim=16, bias=False)
 
     if net_name in ['gas_drift_rec', 'gas_drift_abc']:
-        return MLP_Autoencoder(x_dim=128, h_dims=[64, 32], rep_dim=16, bias=False)
+        return MLP_Autoencoder(x_dim=128, h_dims='64-32', rep_dim=16, bias=False)
 
     # awid
     if net_name in ['awid_one_class', 'awid_hsc']:
-        return MLP(x_dim=13, h_dims=[8, 6], rep_dim=4, bias=False)
+        return MLP(x_dim=13, h_dims='8-6', rep_dim=4, bias=False)
 
     if net_name in ['awid_rec', 'awid_abc']:
-        return MLP_Autoencoder(x_dim=13, h_dims=[8, 6], rep_dim=4, bias=False)
+        return MLP_Autoencoder(x_dim=13, h_dims='8-6', rep_dim=4, bias=False)
 
     return None
 
@@ -174,7 +174,7 @@ def build_network(net_name='fmnist_LeNet_one_class',
 def build_autoencoder(net_name='fmnist_LeNet_one_class',
                       rep_dim=128,
                       x_dim=8,
-                      h_dims=None,
+                      h_dims='32-16',
                       bias=False):
 
     net_name = net_name.strip()
@@ -210,27 +210,27 @@ def build_autoencoder(net_name='fmnist_LeNet_one_class',
         return Gaussian9DNetAutoencoder(rep_dim=2)
 
     if net_name == 'gaussian9d_one_class_debug':
-        return MLP_Autoencoder(x_dim=9, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=9, h_dims='32-16', rep_dim=8, bias=False)
 
     if net_name == 'synthetic_one_class':
-        return MLP_Autoencoder(x_dim=9, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=9, h_dims='32-16', rep_dim=8, bias=False)
 
     if net_name == 'satimage_one_class':
-        return MLP_Autoencoder(x_dim=36, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=x_dim, h_dims=h_dims, rep_dim=rep_dim, bias=False)
 
     if net_name == 'covertype_one_class':
-        return MLP_Autoencoder(x_dim=54, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=54, h_dims=h_dims, rep_dim=8, bias=False)
 
     if net_name == 'phish_url_one_class':
-        return MLP_Autoencoder(x_dim=79, h_dims=[32, 16], rep_dim=8, bias=False)
+        return MLP_Autoencoder(x_dim=79, h_dims='32-16', rep_dim=8, bias=False)
 
     if net_name == 'shuttle_one_class':
-        return MLP_Autoencoder(x_dim=9, h_dims=[16, 8], rep_dim=4, bias=False)
+        return MLP_Autoencoder(x_dim=9, h_dims='16-8', rep_dim=4, bias=False)
 
     if net_name == 'gas_drift_one_class':
-        return MLP_Autoencoder(x_dim=128, h_dims=[64, 32], rep_dim=16, bias=False)
+        return MLP_Autoencoder(x_dim=128, h_dims='64-32', rep_dim=16, bias=False)
 
     if net_name == 'awid_one_class':
-        return MLP_Autoencoder(x_dim=13, h_dims=[8, 6], rep_dim=4, bias=False)
+        return MLP_Autoencoder(x_dim=13, h_dims='8-6', rep_dim=4, bias=False)
 
     return None

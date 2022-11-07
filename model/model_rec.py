@@ -25,9 +25,11 @@ class RecModel:
         self.results = {'train_time': None, 'test_auc': None,
                         'test_time': None, 'test_scores': None}
 
-    def set_network(self, net_name):
+
+    def set_network(self, net_name, rep_dim, x_dim, h_dims, bias):
+
         self.net_name = net_name
-        self.net = build_network(net_name)
+        self.net = build_network(net_name, rep_dim, x_dim, h_dims, bias)
 
     def train(self, dataset, eta: float = 1, optimizer_name: str = 'adam',
               lr: float = 0.001, n_epochs: int = 60, lr_milestones: tuple = (100, 160, 220),
@@ -87,9 +89,9 @@ class RecModelEval:
         self.optimizer_name = None
         self.results = {'test_time': None,'test_scores': None}
 
-    def set_network(self, net_name):
+    def set_network(self, net_name, rep_dim, x_dim, h_dims, bias):
         self.net_name = net_name
-        self.net = build_network(net_name)
+        self.net = build_network(net_name, rep_dim, x_dim, h_dims, bias)
 
     def load_model(self, model_path, map_location='cuda:1'):
         model_dict = torch.load(model_path, map_location=map_location)
