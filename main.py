@@ -7,6 +7,7 @@
 # ############################################
 # 0. Preparation
 # ############################################
+from args import p
 from model import *
 from helper import utils
 from loader import load_dataset
@@ -17,76 +18,13 @@ import sys
 import glob
 import time
 import torch
-import argparse
 import numpy as np
 import pandas as pd
 
-# Initialize the parser
-parser = argparse.ArgumentParser()
 
-# Arguments for config FashionMNIST
-parser.add_argument('-cfg', '--config', type=int, default=0,
-                    help='If config, set to be 1; else 0')
-parser.add_argument('-lb_a_l', '--label_abnormal_list',
-                    action='append', default=[1])
-parser.add_argument('-ra_a', '--ratio_a', type=float, default=0.1,
-                    help='The ratio of the first element in training')
-parser.add_argument('-ra_b', '--ratio_b', type=float, default=0.9,
-                    help='The ratio of the second element in training')
-
-# Arguments for main_loading
-parser.add_argument('-ln', '--loader_name', type=str, default='fmnist',
-                    help='The name for the dataset to be loaded.')
-parser.add_argument('-rt', '--root', type=str, default='./data/',
-                    help='The root for the data folder.')
-parser.add_argument('-fn', '--filename', type=str, default='FashionMNIST',
-                    help='The filename for your data, e.g., MNIST.')
-parser.add_argument('-rr', '--results_root', type=str, default='./results',
-                    help='The directory to save results.')
-parser.add_argument('-lb_n', '--label_normal', type=int, default=0,
-                    help='The normal data needed in training the model.')
-parser.add_argument('-lb_a', '--label_abnormal', type=int, default=1,
-                    help='The abnormal data needed in training the model.')
-parser.add_argument('-ra', '--ratio_abnormal', type=float, default=0.1,
-                    help='The amount of abnormal data needed in training.')
-parser.add_argument('-l', '--test_list', type=str, default='1',
-                    help='The label list to test, e.g. 1, 1-2-3, etc.')
-
-# Arguments for main_network
-parser.add_argument('-nt', '--net_name', type=str, default='fmnist_LeNet_one_class',
-                    help='[Choice]: synthetic_one_class, synthetic_rec')
-
-# Arguments for main_model
-parser.add_argument('-op', '--optimizer_', type=str, default='one_class',
-                    help='The anomaly detection model used for optimizer.',
-                    choices=['one_class', 'one_class_unsupervised',
-                            'rec', 'rec_unsupervised',
-                            'abc', 'hsc'])
-parser.add_argument('-pt', '--pretrain', type=int, default=1,
-                    help='[Choice]: Only apply to DeepSAD model: 1 if True, 0 if False')
-parser.add_argument('-mdl', '--load_model', type=str, default='',
-                    help='[Example]: ./model.tar')
-parser.add_argument('-et', '--eta_str', default=100,
-                    help='The _% representation of eta - choose from 100, 50, 25, etc.')
-parser.add_argument('-opn', '--optimizer_name', type=str, default='adam')
-parser.add_argument('-lr', '--lr', type=float, default=0.001)
-parser.add_argument('-ae_lr', '--ae_lr', type=float, default=0.001)
-parser.add_argument('-ne', '--n_epochs', type=int, default=200)
-parser.add_argument('-ane', '--ae_n_epochs', type=int, default=100)
-parser.add_argument('-lm', '--lr_milestones', type=int, default='80')
-parser.add_argument('-bs', '--batch_size', type=int, default=128)
-parser.add_argument('-wd', '--weight_decay', type=float, default=0.5e-6)
-parser.add_argument('-awd', '--ae_weight_decay', type=float, default=0.5e-3)
-parser.add_argument('-device', '--device', type=str, default='cuda',
-                    help='Use cpu, cuda, or cuda:1, etc.')
-parser.add_argument('-nj', '--n_jobs_dataloader', type=int, default=0)
-parser.add_argument('-sa', '--save_ae', type=int, default=1,
-                    help='Only apply to Deep SAD model.')
-parser.add_argument('-la', '--load_ae', type=int, default=0,
-                    help='Only apply to Deep SAD model.')
-
-p = parser.parse_args()
-
+# ############################################
+# 0. Preparation
+# ############################################
 # ===========================================
 # 0.1. Parameters
 # ===========================================
@@ -172,7 +110,7 @@ dataset = load_dataset(loader_name=loader_name,
 if optimizer_ in ['one_class', 'one_class_unsupervised']:
     # Define model
     model = OneClassModel(optimizer_, eta)
-    model.set_network(net_name)
+    model.set_network(net_name, p.rep_dim, p.x_dim, p.h_dims, p.bias)
 
     # Load other models if specified
     if load_model:
@@ -190,15 +128,15 @@ if optimizer_ in ['one_class', 'one_class_unsupervised']:
 # Load Reconstruction model
 elif optimizer_ in ['rec', 'rec_unsupervised']:
     model = RecModel(optimizer_, eta)
-    model.set_network(net_name)
+    model.set_network(net_name, p.rep_dim, p.x_dim, p.h_dims, p.bias)
 
 elif optimizer_ == 'hsc':
     model = HSCModel()
-    model.set_network(net_name)
+    model.set_network(net_name, p.rep_dim, p.x_dim, p.h_dims, p.bias)
 
 elif optimizer_ == 'abc':
     model = ABCModel()
-    model.set_network(net_name)
+    model.set_network(net_name, p.rep_dim, p.x_dim, p.h_dims, p.bias)
 
 # Training model
 model.train(dataset, eta, optimizer_name, lr, n_epochs, lr_milestones,
@@ -213,7 +151,7 @@ print('Finished. Now I am going to bed. Bye.')
 
 
 # ############################################
-# 2. Model Evaluation (Set the Threshold)
+# 2. Model Evaluation (Set the Threshold)x
 # ############################################
 # Use model eval to load dataset
 if optimizer_ in ['one_class', 'one_class_unsupervised']:
@@ -227,7 +165,7 @@ elif optimizer_ == 'abc':
 else:
     raise Exception('Please input valid model type.')
 
-model.set_network(net_name)
+model.set_network(net_name, p.rep_dim, p.x_dim, p.h_dims, p.bias)
 model.load_model(model_path=model_path, map_location=device)
 
 # Only load normal data, as we just need to set the threshold by FPR

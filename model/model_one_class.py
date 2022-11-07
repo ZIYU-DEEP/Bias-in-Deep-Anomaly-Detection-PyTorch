@@ -35,16 +35,14 @@ class OneClassModel:
         self.ae_results = {'train_time': None, 'test_auc': None,
                            'test_time': None}
 
-    def set_network(self,
-                    net_name: str='fmnist_LeNet_one_class'):
+    def set_network(self, net_name, rep_dim, x_dim, h_dims, bias):
         """
         Set the network structure for the model.
         The key here is to initialize <self.net>.
         """
         self.net_name = net_name
-        # Note that <build_network> is different from <build_autoencoder>
-        # Yet they share the same parameter
-        self.net = build_network(net_name)
+        self.net = build_network(net_name, rep_dim, x_dim, h_dims, bias)
+        self.ae_net = build_autoencoder(net_name, rep_dim, x_dim, h_dims, bias)
 
     def load_model(self,
                    model_path,
@@ -62,8 +60,6 @@ class OneClassModel:
 
         # Load autoencoder parameters if specified
         if load_ae:
-            if self.ae_net is None:
-                self.ae_net = build_autoencoder(self.net_name)
             self.ae_net.load_state_dict(model_dict['ae_net_dict'])
 
     def init_network_weights_from_pretraining(self):
@@ -163,10 +159,6 @@ class OneClassModel:
                  n_jobs_dataloader: int=0,
                  split_train: bool=False,
                  split_test: bool=False):
-        # Set autoencoder network
-        # Note that <build_autoencoder> is different from <build_network>
-        # Yet they share the same parameter
-        self.ae_net = build_autoencoder(self.net_name)
 
         # Train
         self.ae_optimizer_name = optimizer_name
@@ -227,12 +219,13 @@ class OneClassModelEval:
         self.optimizer_name = None
         self.results = {'test_time': None,'test_scores': None}
 
-    def set_network(self, net_name):
+    def set_network(self, net_name, rep_dim, x_dim, h_dims, bias):
         """
+        Set the network structure for the model.
         The key here is to initialize <self.net>.
         """
         self.net_name = net_name
-        self.net = build_network(net_name)
+        self.net = build_network(net_name, rep_dim, x_dim, h_dims, bias)
 
     def load_model(self, model_path, map_location='cuda:1'):
         """
