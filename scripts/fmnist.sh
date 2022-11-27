@@ -34,4 +34,4 @@ ae_weight_decay=0.5e-3
 device=cpu
 
 # Run
-python main.py -ln ${loader_name} -rt ${root} -rr ${results_root} -fn ${filename} -lb_n ${label_normal} -lb_a ${label_abnormal} -ra ${ratio_abnormal} -nt ${net_name} -op ${optimizer_} -l ${test_list} -ne ${n_epochs} -ane ${ae_n_epochs} -device ${device} -lr ${lr} -ae_lr ${ae_lr} -lm ${lr_milestones} -bs ${batch_size} -wd ${weight_decay} -awd ${ae_weight_decay}
+python3 main.py -ln ${loader_name} -rt ${root} -rr ${results_root} -fn ${filename} -lb_n ${label_normal} -lb_a ${label_abnormal} -ra ${ratio_abnormal} -nt ${net_name} -op ${optimizer_} -l ${test_list} -ne ${n_epochs} -ane ${ae_n_epochs} -device ${device} -lr ${lr} -ae_lr ${ae_lr} -lm ${lr_milestones} -bs ${batch_size} -wd ${weight_decay} -awd ${ae_weight_decay}

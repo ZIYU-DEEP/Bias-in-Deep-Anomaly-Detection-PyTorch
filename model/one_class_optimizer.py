@@ -333,7 +333,10 @@ class OneClassTrainer(BaseTrainer):
         c[(abs(c) < eps) & (c < 0)] = - eps
         c[(abs(c) < eps) & (c > 0)] = eps
 
-        return c
+        # Notice the center is normalized
+        # This is different from the original code of Deep SAD
+        # Yet may be more robust
+        return c / torch.norm(c)
 
 
 # #########################################################################
@@ -496,7 +499,10 @@ class OneClassTrainer_(BaseTrainer):
         c[(abs(c) < eps) & (c < 0)] = - eps
         c[(abs(c) < eps) & (c > 0)] = eps
 
-        return c
+        # Notice the center is normalized
+        # This is different from the original code of Deep SAD
+        # Yet may be more robust
+        return c / torch.norm(c)
 
 
 # #########################################################################

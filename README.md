@@ -53,6 +53,8 @@ $ . scripts/fmnist.sh
 # Run the satimage experiments
 $ . scripts/satimage.sh
 ```
+If you are unable to run `.sh` files for some reasons, you may directly copy and paste the arguments in those scripts to the terminal and directly using the python command to run.
+
 The data for the real-world datasets are downloadable on UCI repository; please check our paper and `./helper/fetch_data.py` for details.
 
 
